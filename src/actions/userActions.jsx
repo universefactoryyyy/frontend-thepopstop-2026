@@ -44,6 +44,8 @@ import {
 
 const API = import.meta.env.VITE_API
 
+axios.defaults.withCredentials = true
+
 // Firebase ID token -> our backend, which verifies it (firebase-admin) and sets the session cookie
 const exchangeToken = async (firebaseUser, path = '/login') => {
     const idToken = await firebaseUser.getIdToken()

@@ -21,7 +21,7 @@ const Profile = () => {
                     <UserAvatar user={user} className="pop-avatar pop-avatar-xl mb-3" alt={user.name} />
                     <div className="d-grid gap-2">
                         <Link to="/me/update" className="btn btn-primary">Edit profile</Link>
-                        {user.role !== 'admin' && <Link to="/orders/me" className="btn btn-outline-primary">My orders</Link>}
+                        <Link to="/orders/me" className="btn btn-outline-primary">My orders</Link>
                     </div>
                 </div>
                 <div className="col-md-7 col-lg-6">

@@ -18,8 +18,8 @@ import ReviewForm from './ReviewForm'
 import UserAvatar from '../Layout/UserAvatar'
 
 // Ratings & reviews of one product:
-//  - only customers with a DELIVERED order containing the product can write a review (and later edit it)
-//  - the admin can delete any review
+//  - anyone with a DELIVERED order containing the product can write a review (and later edit it), including admin
+//  - the admin can also delete any review
 const ProductReviews = ({ product, variant = 'all' }) => {
     const dispatch = useDispatch()
     const { user, isAuthenticated } = useSelector(state => state.auth)
@@ -29,7 +29,7 @@ const ProductReviews = ({ product, variant = 'all' }) => {
     const { isDeleted, error: deleteError } = useSelector(state => state.review)
 
     const isAdmin = Boolean(user && user.role === 'admin')
-    const checkingEligibility = Boolean(isAuthenticated && !isAdmin && eligibilityLoading)
+    const checkingEligibility = Boolean(isAuthenticated && eligibilityLoading)
     const [ratingFilter, setRatingFilter] = useState(0)
 
     const visibleReviews = useMemo(
@@ -103,7 +103,7 @@ const ProductReviews = ({ product, variant = 'all' }) => {
         <div className="alert alert-light border" id="write-review">
             <Link to="/login" state={{ from: `/product/${product._id}` }}>Login</Link> to review this product after you have received it.
         </div>
-    ) : isAdmin ? null : checkingEligibility ? (
+    ) : checkingEligibility ? (
         <div className="card pop-review-form mb-4" id="write-review">
             <div className="card-body text-center py-4">
                 <div className="spinner-border" role="status" />
@@ -114,7 +114,7 @@ const ProductReviews = ({ product, variant = 'all' }) => {
         <ReviewForm initialReview={myReview} onSubmit={submitReview} submitting={saving} />
     ) : (
         <div className="alert alert-light border" id="write-review">
-            Only customers who received this product (a delivered order) can review it.
+            You can review this product after you have received it (a delivered order).
         </div>
     )
 

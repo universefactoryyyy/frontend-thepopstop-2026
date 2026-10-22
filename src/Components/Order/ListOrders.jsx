@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { DataGrid } from '@mui/x-data-grid'
 import { myOrders, clearErrors } from '../../actions/orderActions'
-import { errMsg, formatDate, formatPeso, orderNumber, orderStatusClass } from '../../Utils/helpers'
+import { errMsg, formatDate, formatPeso, orderNumber, orderStatusClass, productIdOf } from '../../Utils/helpers'
 import MetaData from '../Layout/MetaData'
 import ReceiptButton from './ReceiptButton'
 
 // One product goes straight to its review form. Several products go to the order, which lists each one.
 const reviewPath = (order) => {
-    const productIds = [...new Set((order.orderItems || []).map(item => item.product).filter(Boolean).map(String))]
-    if (productIds.length === 1) return `/product/${productIds[0]}#reviews-heading`
+    const productIds = [...new Set((order.orderItems || []).map(item => productIdOf(item.product)).filter(Boolean))]
+    if (productIds.length === 1) return `/product/${productIds[0]}#write-review`
     return `/order/${order._id}`
 }
 

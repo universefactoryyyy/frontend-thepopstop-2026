@@ -32,11 +32,20 @@ const ProductDetails = () => {
     const isCurrent = product && product._id === id
 
     useEffect(() => {
-        if (!isCurrent || hash !== '#reviews-heading') return undefined
-        const scroll = () => document.getElementById('reviews-heading')?.scrollIntoView({ block: 'start' })
-        scroll()
-        const timers = [200, 600].map(delay => window.setTimeout(scroll, delay))
-        return () => timers.forEach(timer => window.clearTimeout(timer))
+        const wantsReview = hash === '#write-review' || hash === '#reviews-heading'
+        if (!isCurrent || !wantsReview) return undefined
+        let cancelled = false
+        const scroll = () => {
+            const el = document.getElementById('write-review') || document.getElementById('reviews-heading')
+            if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+            return Boolean(el)
+        }
+        const tryScroll = (attempt = 0) => {
+            if (cancelled || scroll() || attempt > 20) return
+            window.setTimeout(() => tryScroll(attempt + 1), 100)
+        }
+        tryScroll()
+        return () => { cancelled = true }
     }, [isCurrent, hash])
 
     if (!isCurrent) {
@@ -105,9 +114,10 @@ const ProductDetails = () => {
                     <h2 className="mt-2 mb-1">{product.name}</h2>
                     <p className="text-muted mb-2">by {product.brand}</p>
 
-                    <div className="d-flex align-items-center gap-2 mb-3">
+                    <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
                         <Rating value={product.ratings || 0} precision={0.5} readOnly />
                         <span className="text-muted">({product.numOfReviews || 0} reviews)</span>
+                        <a href="#write-review" className="small">Write a review</a>
                     </div>
 
                     <p className="pop-price pop-price-lg">{formatPeso(product.price)}</p>
@@ -117,9 +127,7 @@ const ProductDetails = () => {
                         {!soldOut && <span className="text-muted ms-2">{stock} available</span>}
                     </p>
 
-                    <p style={{ whiteSpace: 'pre-line' }}>{product.description}</p>
-
-                    <div className="d-flex align-items-center gap-3 mt-4">
+                    <div className="d-flex align-items-center gap-3 mt-4 mb-4">
                         <div className="input-group pop-qty" style={{ width: 140 }}>
                             <button
                                 type="button"
@@ -154,10 +162,14 @@ const ProductDetails = () => {
                             <AddShoppingCartIcon /> {soldOut ? 'Out of stock' : 'Add to cart'}
                         </button>
                     </div>
+
+                    <ProductReviews product={product} variant="form" />
+
+                    <p className="mt-4" style={{ whiteSpace: 'pre-line' }}>{product.description}</p>
                 </div>
             </div>
 
-            <ProductReviews product={product} />
+            <ProductReviews product={product} variant="list" />
         </div>
     )
 }

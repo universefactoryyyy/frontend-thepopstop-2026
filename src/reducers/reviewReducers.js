@@ -55,8 +55,9 @@ export const reviewEligibilityReducer = (state = { canReview: false, review: nul
     switch (action.type) {
         case REVIEW_ELIGIBILITY_REQUEST:
             return {
-                ...state,
-                loading: true
+                loading: true,
+                canReview: false,
+                review: null
             }
         case REVIEW_ELIGIBILITY_SUCCESS:
             return {

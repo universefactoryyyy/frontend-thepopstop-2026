@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
 import { getOrderDetails, clearErrors } from '../../actions/orderActions'
 import {
-    errMsg, formatDateTime, formatPeso, orderNumber, orderStatusClass, productImage, ORDER_STATUSES,
+    errMsg, formatDateTime, formatPeso, orderNumber, orderStatusClass, productIdOf, productImage, ORDER_STATUSES,
 } from '../../Utils/helpers'
 import ReceiptButton from './ReceiptButton'
 import MetaData from '../Layout/MetaData'
@@ -91,11 +91,11 @@ const OrderDetails = () => {
                                 <div className="d-flex align-items-center gap-3 mb-3" key={item._id || item.product}>
                                     <img src={item.image || productImage(null)} alt="" className="pop-cart-img" />
                                     <div className="flex-grow-1">
-                                        <Link to={`/product/${item.product}`} className="pop-product-title fw-semibold">{item.name}</Link>
+                                        <Link to={`/product/${productIdOf(item.product)}`} className="pop-product-title fw-semibold">{item.name}</Link>
                                         <div className="text-muted small">{item.series}</div>
                                         <div className="small">{item.quantity} &times; {formatPeso(item.price)}</div>
                                         {order.orderStatus === 'Delivered' && (
-                                            <Link to={`/product/${item.product}`} className="small">Rate this product</Link>
+                                            <Link to={`/product/${productIdOf(item.product)}#write-review`} className="small">Rate this product</Link>
                                         )}
                                     </div>
                                     <strong>{formatPeso(item.price * item.quantity)}</strong>

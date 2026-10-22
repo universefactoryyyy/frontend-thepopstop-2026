@@ -1,12 +1,47 @@
+import { useState } from 'react'
 import { Formik, Form as FormikForm } from 'formik'
 import * as Yup from 'yup'
-import Rating from '@mui/material/Rating'
+import StarIcon from '@mui/icons-material/Star'
+import StarBorderIcon from '@mui/icons-material/StarBorder'
 
 const reviewSchema = Yup.object({
     rating: Yup.number().min(1, 'Please select a rating').max(5).required('Please select a rating'),
     comment: Yup.string().trim().max(1000, 'Review cannot exceed 1000 characters'),
     anonymous: Yup.boolean(),
 })
+
+const StarPicker = ({ value, onChange }) => {
+    const [hover, setHover] = useState(0)
+    const shown = hover || value || 0
+
+    return (
+        <div
+            className="pop-star-picker"
+            role="radiogroup"
+            aria-label="Your rating"
+            onMouseLeave={() => setHover(0)}
+        >
+            {[1, 2, 3, 4, 5].map((star) => {
+                const filled = star <= shown
+                return (
+                    <button
+                        type="button"
+                        key={star}
+                        className={filled ? 'active' : ''}
+                        onMouseEnter={() => setHover(star)}
+                        onFocus={() => setHover(star)}
+                        onClick={() => onChange(star)}
+                        aria-checked={value === star}
+                        aria-label={`${star} star${star === 1 ? '' : 's'}`}
+                        role="radio"
+                    >
+                        {filled ? <StarIcon fontSize="inherit" /> : <StarBorderIcon fontSize="inherit" />}
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
 
 // Create a review - or edit the customer's existing one (initialReview)
 const ReviewForm = ({ initialReview, onSubmit, submitting }) => {
@@ -24,23 +59,20 @@ const ReviewForm = ({ initialReview, onSubmit, submitting }) => {
             onSubmit={(values) => onSubmit(values)}
         >
             {({ values, errors, touched, handleChange, handleBlur, setFieldValue, setFieldTouched }) => (
-                <FormikForm noValidate className="card pop-review-form mb-4">
+                <FormikForm noValidate className="card pop-review-form mb-4" id="write-review">
                     <div className="card-body">
                         <h5 className="mb-3">{isEdit ? 'Edit your review' : 'Write a review'}</h5>
 
                         <div className="mb-3">
-                            <label className="form-label d-block" id="rating-label">Your rating</label>
-                            <Rating
-                                name="rating"
+                            <p className="form-label mb-1" id="rating-label">Your rating</p>
+                            <StarPicker
                                 value={values.rating}
-                                size="large"
-                                aria-labelledby="rating-label"
-                                onChange={(e, value) => {
-                                    setFieldValue('rating', value || 0)
+                                onChange={(next) => {
+                                    setFieldValue('rating', next)
                                     setFieldTouched('rating', true, false)
                                 }}
                             />
-                            {touched.rating && errors.rating && <div className="text-danger small">{errors.rating}</div>}
+                            {touched.rating && errors.rating && <div className="text-danger small mt-1">{errors.rating}</div>}
                         </div>
 
                         <div className="mb-3">

@@ -26,6 +26,13 @@ export const orderNumber = (order) => String(order._id).slice(-8).toUpperCase();
 export const productImage = (product) =>
     product && product.images && product.images.length ? product.images[0].url : PLACEHOLDER_IMAGE;
 
+// orderItems.product may be an id string or a populated { _id } object
+export const productIdOf = (product) => {
+    if (!product) return ''
+    if (typeof product === 'object') return String(product._id || '')
+    return String(product)
+}
+
 export const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
 // bootstrap badge colour per order status

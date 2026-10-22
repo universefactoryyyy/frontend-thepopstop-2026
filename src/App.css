@@ -183,7 +183,26 @@
 .pop-grid-wrap .MuiTablePagination-actions { display: flex; align-items: center; margin-left: 8px; }
 .pop-grid-wrap .badge { display: inline-flex; align-items: center; line-height: 1; }
 .pop-grid-actions { display: flex; align-items: center; gap: 0.5rem; height: 100%; flex-wrap: nowrap; }
-.pop-reviews-heading { scroll-margin-top: 6rem; }
+.pop-reviews-heading, #write-review { scroll-margin-top: 6rem; }
+.pop-star-picker { display: flex; align-items: center; gap: 0.1rem; }
+.pop-star-picker button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--pop-beige500);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.pop-star-picker button:hover,
+.pop-star-picker button.active { color: var(--pop-warning); }
+.pop-star-picker button:focus-visible { outline: 3px solid var(--pop-green500); outline-offset: 2px; }
 .pop-receipt-frame { width: 100%; height: 70vh; border: 1px solid var(--pop-beige300); border-radius: var(--pop-radius-sm); background: var(--pop-white); }
 .pop-grid-wrap .MuiDataGrid-row:hover { background: var(--pop-beige100); }
 .pop-grid-wrap .MuiDataGrid-row.Mui-selected { background: var(--pop-green100); }

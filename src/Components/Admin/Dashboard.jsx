@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import {
-    ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+    ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
 } from 'recharts'
 import {
-    fetchStats, fetchSalesPerMonth, fetchSalesByRange,
+    fetchStats, fetchSalesByRange,
 } from '../../actions/dashboardActions'
 import { errMsg, formatPeso, getErrorMessage } from '../../Utils/helpers'
 import { palette } from '../../theme'
 import MetaData from '../Layout/MetaData'
 import Loader from '../Layout/Loader'
+import MonthlySalesChart from './MonthlySalesChart'
 
 const pesoTick = (value) => `\u20B1${Number(value).toLocaleString('en-PH')}`
 
@@ -34,12 +35,6 @@ const StatCard = ({ label, value, tone }) => (
 const Dashboard = () => {
     const [stats, setStats] = useState(null)
 
-    // monthly sales (line chart, all 12 months)
-    const [year, setYear] = useState(new Date().getFullYear())
-    const [years, setYears] = useState([new Date().getFullYear()])
-    const [monthly, setMonthly] = useState([])
-
-    // sales between two dates (bar chart)
     const [range, setRange] = useState(defaultRange)
     const [applied, setApplied] = useState(range)
     const [rangeData, setRangeData] = useState(null)
@@ -47,18 +42,6 @@ const Dashboard = () => {
     useEffect(() => {
         fetchStats().then(setStats).catch(e => errMsg(getErrorMessage(e)))
     }, [])
-
-    useEffect(() => {
-        let ignore = false
-        fetchSalesPerMonth(year)
-            .then(data => {
-                if (ignore) return
-                setMonthly(data.salesPerMonth)
-                setYears(data.years)
-            })
-            .catch(e => errMsg(getErrorMessage(e)))
-        return () => { ignore = true }
-    }, [year])
 
     useEffect(() => {
         let ignore = false
@@ -95,32 +78,7 @@ const Dashboard = () => {
                 <StatCard label="Out of stock" value={stats.outOfStock} />
             </div>
 
-            <div className="card mb-4">
-                <div className="card-body">
-                    <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                        <h5 className="mb-0">Monthly sales</h5>
-                        <select
-                            className="form-select form-select-sm"
-                            style={{ width: 'auto' }}
-                            value={year}
-                            onChange={(e) => setYear(Number(e.target.value))}
-                            aria-label="Year"
-                        >
-                            {years.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select>
-                    </div>
-                    <ResponsiveContainer width="100%" height={320}>
-                        <LineChart data={monthly} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke={palette.beige300} />
-                            {/* interval={0}: every one of the 12 month labels is shown */}
-                            <XAxis dataKey="month" interval={0} stroke={palette.textMuted} />
-                            <YAxis tickFormatter={pesoTick} stroke={palette.textMuted} width={80} />
-                            <Tooltip formatter={tooltipPeso} />
-                            <Line type="monotone" dataKey="total" name="Sales" stroke={palette.green500} strokeWidth={3} dot={{ r: 4, fill: palette.green500 }} activeDot={{ r: 6 }} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
+            <MonthlySalesChart />
 
             <div className="card mb-4">
                 <div className="card-body">

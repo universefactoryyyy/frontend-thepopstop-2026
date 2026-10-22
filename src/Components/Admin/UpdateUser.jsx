@@ -10,12 +10,6 @@ import MetaData from '../Layout/MetaData'
 import Loader from '../Layout/Loader'
 import FormField from '../Layout/FormField'
 
-const schema = Yup.object({
-    name: Yup.string().trim().required('Name is required').max(60, 'Max 60 characters'),
-    role: Yup.string().oneOf(['customer', 'employee', 'admin']).required(),
-    isActive: Yup.string().oneOf(['true', 'false']).required(),
-})
-
 // Admin: change a user's role / active status
 const UpdateUser = () => {
     const { id } = useParams()
@@ -49,6 +43,18 @@ const UpdateUser = () => {
     if (!user || user._id !== id) return <Loader />
 
     const isSelf = me && me._id === user._id
+    const isAdminAccount = user.role === 'admin'
+    const allowedRoles = isAdminAccount ? ['admin'] : ['customer', 'employee']
+    const schema = Yup.object({
+        name: Yup.string().trim().required('Name is required').max(60, 'Max 60 characters'),
+        role: Yup.string().oneOf(allowedRoles).required(),
+        isActive: Yup.string().oneOf(['true', 'false']).required(),
+    })
+    const roleHelp = isSelf
+        ? 'You cannot change your own role'
+        : user.role === 'customer'
+            ? 'A customer can only be changed to employee'
+            : undefined
 
     return (
         <div>
@@ -69,17 +75,22 @@ const UpdateUser = () => {
                     >
                         <Form noValidate>
                             <FormField label="Name" name="name" type="text" />
-                            <FormField label="Role" name="role" as="select" disabled={isSelf} help={isSelf ? 'You cannot change your own role' : undefined}>
-                                <option value="customer">Customer</option>
-                                <option value="employee">Employee</option>
-                                <option value="admin">Admin</option>
+                            <FormField label="Role" name="role" as="select" disabled={isSelf} help={roleHelp}>
+                                {isAdminAccount ? (
+                                    <option value="admin">Admin</option>
+                                ) : (
+                                    <>
+                                        <option value="customer">Customer</option>
+                                        <option value="employee">Employee</option>
+                                    </>
+                                )}
                             </FormField>
                             <FormField
                                 label="Account status"
                                 name="isActive"
                                 as="select"
-                                disabled={isSelf || user.role === 'admin'}
-                                help={user.role === 'admin' ? 'Admin accounts stay active' : undefined}
+                                disabled={isSelf || isAdminAccount}
+                                help={isAdminAccount ? 'Admin accounts stay active' : undefined}
                             >
                                 <option value="true">Active</option>
                                 <option value="false">Inactive</option>

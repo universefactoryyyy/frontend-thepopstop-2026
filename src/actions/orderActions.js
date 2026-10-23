@@ -114,7 +114,7 @@ export const allOrders = () => async (dispatch) => {
 export const updateOrder = (id, status) => async (dispatch) => {
     try {
         dispatch({ type: UPDATE_ORDER_REQUEST })
-        const { data } = await axios.put(`${API}/admin/order/${id}`, { status })
+        const { data } = await axios.put(`${API}/admin/order/${id}`, { status }, { timeout: 15000 })
         dispatch({
             type: UPDATE_ORDER_SUCCESS,
             payload: data
@@ -124,6 +124,8 @@ export const updateOrder = (id, status) => async (dispatch) => {
             type: UPDATE_ORDER_FAIL,
             payload: getErrorMessage(error)
         })
+        // status may already be saved even if Gmail timed out
+        dispatch(getOrderDetails(id))
     }
 }
 

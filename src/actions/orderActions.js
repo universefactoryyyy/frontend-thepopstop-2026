@@ -124,7 +124,7 @@ export const updateOrder = (id, status) => async (dispatch) => {
             type: UPDATE_ORDER_FAIL,
             payload: getErrorMessage(error)
         })
-        // status may already be saved even if Gmail timed out
+        // status may already be saved even if email sending timed out
         dispatch(getOrderDetails(id))
     }
 }
